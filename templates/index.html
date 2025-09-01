@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Contacts</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-white">
+    <div class="container mx-auto p-4 md:p-8 lg:p-12">
+        <!-- Header -->
+        <header class="bg-gray-900 shadow-lg rounded-xl p-6 md:p-8 lg:p-10 mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold">My Contacts!</h1>
+        </header>
+
+        <!-- Flash messages display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="bg-{{ 'red' if category == 'danger' else 'green' }}-500 p-4 rounded-md mb-4 text-center text-white">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- New Contact Form -->
+            <div class="lg:col-span-1 bg-gray-900 p-6 md:p-8 rounded-xl shadow-lg h-fit">
+                <h2 class="text-xl md:text-2xl font-semibold mb-4 text-center">NEW CONTACT:</h2>
+                <form action="{{ url_for('add_contact') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-400">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" required class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label for="phoneNumber" class="block text-sm font-medium text-gray-400">Phone Number</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" required class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-400">Email Address</label>
+                        <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label for="profilepicture" class="block text-sm font-medium text-gray-400">Profile Picture</label>
+                        <input type="text" id="profilepicture" name="profilepicture" required class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 placeholder-gray-400">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition-colors duration-200">
+                        SUBMIT
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contacts Display Section -->
+            <div class="lg:col-span-2">
+                <h2 class="text-xl md:text-2xl font-semibold mb-4 text-center">CONTACTS:</h2>
+                <div id="contactsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Contact cards will be rendered here by Jinja2 -->
+                    {% for contact in contacts %}
+                    <div class="bg-gray-900 p-4 rounded-xl shadow-lg relative transition-transform duration-200 hover:scale-105">
+                        <!-- Delete Button -->
+                        <a href="/delete?contactid={{contact['_id']}}" class="absolute top-2 right-2 text-red-500 hover:text-red-600 transition-colors duration-200">
+                            <i class="fas fa-times-circle text-lg"></i>
+                        </a>
+
+                        <div class="flex flex-col items-center text-center mt-2">
+                            <!-- User Icon -->
+                            <div class="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center mb-2 border-2 border-gray-700">
+                                {%if 'profilePicture' in contact%}
+                                <img src="{{contact['profilePicture']}}" alt="Contact Profile Picture" class="w-full h-full object-cover">
+                                {%else%}
+                                <img src="https://media.istockphoto.com/id/2151669184/vector/vector-flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral.jpg?s=612x612&w=0&k=20&c=UEa7oHoOL30ynvmJzSCIPrwwopJdfqzBs0q69ezQoM8=" alt="Contact Profile Picture" class="w-full h-full object-cover">
+                                {%endif%}
+                                
+                            </div>
+                            
+                            <!-- Contact Details -->
+                            <h3 class="text-lg font-medium">{{contact['name']}}</h3>
+                            <p class="text-sm text-gray-400">{{ contact['phone']}}</p>
+                            <p class="text-sm text-gray-400">{{ contact['email']}}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
